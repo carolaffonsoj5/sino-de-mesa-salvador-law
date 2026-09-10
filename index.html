@@ -113,6 +113,31 @@
   .proximo .quando{font-size:13.5px; color:var(--ink-2)}
   .proximo.vazio{border-left-color:var(--line-strong)}
 
+  /* ---------- em andamento ---------- */
+  #blocoAndamento{display:flex; flex-direction:column; gap:10px}
+  .rodando{
+    border:1px solid var(--line); border-left:3px solid var(--selo-ink);
+    background:var(--selo-bg); color:var(--selo-ink);
+    border-radius:var(--r); padding:16px 20px;
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    box-shadow:var(--shadow);
+  }
+  .rodando-corpo{display:flex; flex-direction:column; gap:3px; min-width:0; margin-right:auto}
+  .rodando-corpo .rotulo{color:inherit; opacity:.75}
+  .rodando-corpo strong{font-family:var(--f-disp); font-size:22px; font-weight:500; line-height:1.25; overflow-wrap:anywhere}
+  .rodando-corpo .quando{font-size:13.5px; opacity:.85; font-family:var(--f-num)}
+  .rodando-corpo .nota{font-size:13px; opacity:.85; margin-top:2px; overflow-wrap:anywhere}
+  .rodando-acoes{display:flex; gap:8px; flex-wrap:wrap}
+  .rodando-acoes .btn{border-color:currentColor; background:transparent; color:inherit}
+  .rodando-acoes .btn:hover{background:rgba(0,0,0,.06)}
+  .rodando-acoes .btn-forte{background:var(--selo-ink); border-color:var(--selo-ink); color:var(--selo-bg)}
+  .rodando-acoes .btn-forte:hover{background:var(--selo-ink); opacity:.85; color:var(--selo-bg)}
+  @media (max-width:560px){
+    .rodando-acoes{width:100%}
+    .rodando-acoes .btn{flex:1}
+  }
+  .item.rodando-item{border-left-color:var(--selo-ink)}
+
   /* ---------- listas ---------- */
   .grupo{display:flex; flex-direction:column; gap:10px}
   .grupo-cabeca{display:flex; align-items:baseline; gap:10px; padding:0 2px}
@@ -245,9 +270,51 @@
     transition:background .15s, border-color .15s;
   }
   #alarme .botoes button:hover{background:#223A5C; border-color:#5A7CA8}
-  #alarme .botoes .feito{background:#B08D4F; border-color:#B08D4F; color:#10192B}
-  #alarme .botoes .feito:hover{background:#C6A263; border-color:#C6A263}
+  #alarme .botoes .principal{background:#B08D4F; border-color:#B08D4F; color:#10192B}
+  #alarme .botoes .principal:hover{background:#C6A263; border-color:#C6A263}
+  #alarme .botoes .discreto{border-color:transparent; color:#93A6C0; font-weight:500}
+  #alarme .botoes .discreto:hover{background:transparent; border-color:#3D5C86; color:#EAF0F7}
   #alarme .rodape{margin-top:26px; font-size:12.5px; color:#93A6C0; max-width:40ch; line-height:1.5}
+
+  /* painel de adiamento */
+  #alAdiarPainel{
+    margin-top:22px; display:flex; flex-direction:column; gap:14px; align-items:center;
+    border:1px solid #3D5C86; border-radius:12px; padding:18px 20px;
+    background:rgba(11,22,38,.55); max-width:520px; width:100%;
+  }
+  #alAdiarPainel .pergunta{
+    font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:#A28C63; font-weight:600;
+  }
+  .adiar-chips{display:flex; flex-wrap:wrap; gap:8px; justify-content:center}
+  .adiar-chips button{
+    border:1px solid #3D5C86; background:transparent; color:#EAF0F7;
+    border-radius:999px; padding:8px 16px; font-size:15px; font-weight:500;
+    font-family:var(--f-num); transition:background .15s, border-color .15s;
+  }
+  .adiar-chips button:hover{background:#223A5C; border-color:#5A7CA8}
+  .adiar-livre{display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:center}
+  .adiar-livre input{
+    width:84px; font:inherit; font-family:var(--f-num); font-size:16px; text-align:center;
+    border:1px solid #3D5C86; border-radius:9px; padding:8px 6px;
+    background:#101E33; color:#F3F1EB;
+  }
+  .adiar-unid{display:flex; border:1px solid #3D5C86; border-radius:9px; overflow:hidden}
+  .adiar-unid button{
+    border:0; border-right:1px solid #3D5C86; background:transparent; color:#C7D0DC;
+    padding:9px 14px; font-size:14px; font-weight:500;
+  }
+  .adiar-unid button:last-child{border-right:0}
+  .adiar-unid button[aria-pressed=true]{background:#2B4770; color:#F3F1EB}
+  #alAdiarOk{
+    border:1px solid #B08D4F; background:#B08D4F; color:#10192B;
+    border-radius:9px; padding:9px 20px; font-size:15px; font-weight:600;
+  }
+  #alAdiarOk:hover{background:#C6A263; border-color:#C6A263}
+  #alAdiarErro{font-size:13px; color:#E58A76; min-height:0}
+  @media (max-width:560px){
+    #alAdiarPainel{padding:16px 14px}
+    .adiar-chips button{padding:9px 14px; font-size:14.5px}
+  }
   #alarme .anel{
     position:absolute; width:min(90vmin,900px); aspect-ratio:1; border-radius:50%;
     border:1px solid rgba(201,169,106,.32); pointer-events:none;
@@ -275,6 +342,8 @@
 
 <main class="tela">
   <section class="agenda">
+    <div id="blocoAndamento" aria-live="polite" hidden></div>
+
     <div class="proximo vazio" id="proximo" aria-live="polite">
       <span class="rotulo">Próximo alerta</span>
       <strong id="proxTitulo">Nenhum lembrete programado</strong>
@@ -400,9 +469,22 @@
   <div class="titulo" id="alTitulo"></div>
   <div class="nota" id="alNota"></div>
   <div class="botoes">
-    <button type="button" class="feito" id="alFeito">Feito</button>
-    <button type="button" id="alAdiar10">Adiar 10 min</button>
-    <button type="button" id="alAdiar60">Adiar 1 hora</button>
+    <button type="button" class="principal" id="alComecar">Começar agora</button>
+    <button type="button" id="alAdiarAbrir">Adiar…</button>
+    <button type="button" class="discreto" id="alPular">Pular hoje</button>
+  </div>
+  <div id="alAdiarPainel" hidden>
+    <span class="pergunta">Adiar por quanto tempo?</span>
+    <div class="adiar-chips" id="alAdiarChips"></div>
+    <div class="adiar-livre">
+      <input type="number" id="alAdiarNum" min="1" max="1440" step="1" inputmode="numeric" aria-label="Quantidade">
+      <div class="adiar-unid" id="alAdiarUnid" role="group" aria-label="Unidade">
+        <button type="button" data-unid="min" aria-pressed="true">minutos</button>
+        <button type="button" data-unid="h" aria-pressed="false">horas</button>
+      </div>
+      <button type="button" id="alAdiarOk">Adiar</button>
+    </div>
+    <span id="alAdiarErro"></span>
   </div>
   <div class="rodape" id="alRodape"></div>
 </div>
@@ -521,6 +603,8 @@
   // Ocorrência de hoje (ou da data marcada) que já passou e ainda não foi tratada.
   function ocorrenciaVencida(t, agora){
     if (!t.ativa || t.concluida) return null;
+    // Já está sendo feita agora: não toca de novo até finalizar.
+    if (t.inicio) return null;
 
     if (t.adiarAte){
       if (agora.getTime() < t.adiarAte) return null;
@@ -551,6 +635,7 @@
   // Próxima ocorrência futura, para o painel "próximo alerta".
   function proximaOcorrencia(t, agora){
     if (!t.ativa || t.concluida) return null;
+    if (t.inicio && t.tipo === "unica") return null;
     if (t.adiarAte && t.adiarAte > agora.getTime()) return t.adiarAte;
     if (t.tipo === "unica"){
       if (!t.data || t.ultimoDisparo === t.data) return null;
@@ -659,7 +744,7 @@
     try{
       fecharNotif();
       notifAtual = new Notification(t.titulo, {
-        body: (t.nota ? t.nota + " — " : "") + "Marcado para às " + t.hora,
+        body: (t.nota ? t.nota + " — " : "") + "Hora de começar (marcado para às " + t.hora + ")",
         tag: "sino-" + t.id,
         requireInteraction: true,
         renotify: true
@@ -692,8 +777,8 @@
     var el = document.getElementById("alarme");
     document.getElementById("alFila").textContent = total > 1 ? "1 de " + total + " lembretes" : "Lembrete";
     var atraso = Date.now() - item.oc.ts;
-    var rel = "Marcado para às " + item.t.hora;
-    if (item.oc.adiada) rel = "Adiado — voltando agora";
+    var rel = "Hora de começar · marcado para às " + item.t.hora;
+    if (item.oc.adiada) rel = "Adiado — hora de começar";
     else if (atraso > 90000) rel += " · atrasado " + fmtDuracao(atraso).replace("em ","");
     document.getElementById("alRel").textContent = rel;
     document.getElementById("alTitulo").textContent = item.t.titulo;
@@ -701,8 +786,9 @@
     n.textContent = item.t.nota || "";
     n.hidden = !item.t.nota;
     el.hidden = false;
+    document.getElementById("alAdiarPainel").hidden = true;
     document.body.classList.add("travado");
-    document.getElementById("alFeito").focus();
+    document.getElementById("alComecar").focus();
     iniciarSom();
     notificar(item.t);
     document.getElementById("alRodape").textContent = somBloqueado()
@@ -712,6 +798,8 @@
 
   function fecharAlarme(){
     estado.alarmeAtivo = null;
+    document.getElementById("alAdiarPainel").hidden = true;
+    document.getElementById("alAdiarErro").textContent = "";
     document.getElementById("alarme").hidden = true;
     document.body.classList.remove("travado");
     pararSom();
@@ -720,32 +808,113 @@
     setTimeout(verificar, 400);
   }
 
-  function acaoFeito(){
+  function acharTarefa(idt){
+    for (var i=0;i<estado.tarefas.length;i++){ if (estado.tarefas[i].id === idt) return estado.tarefas[i]; }
+    return null;
+  }
+
+  // O alarme é a hora de COMEÇAR. A tarefa passa a "em andamento" e só sai de lá
+  // quando ela clicar em "Finalizei".
+  function acaoComecar(){
     var it = estado.alarmeAtivo; if (!it) return;
     var t = Object.assign({}, it.t);
     t.ultimoDisparo = it.oc.chave;
     t.adiarAte = null; t.chaveAdiada = null;
-    if (t.tipo === "unica") t.concluida = true;
+    t.inicio = Date.now();
+    t.chaveInicio = it.oc.chave;
     salvarTarefa(t);
-    registrar(t, "feito");
+    registrar(t, "começou");
     fecharAlarme();
   }
+
+  function acaoPular(){
+    var it = estado.alarmeAtivo; if (!it) return;
+    var t = Object.assign({}, it.t);
+    t.ultimoDisparo = it.oc.chave;
+    t.adiarAte = null; t.chaveAdiada = null;
+    t.inicio = null; t.chaveInicio = null;
+    if (t.tipo === "unica") t.concluida = true;
+    salvarTarefa(t);
+    registrar(t, "pulada");
+    fecharAlarme();
+  }
+
+  function finalizarTarefa(idt){
+    var alvo = acharTarefa(idt); if (!alvo || !alvo.inicio) return;
+    var t = Object.assign({}, alvo);
+    var dur = Date.now() - t.inicio;
+    t.inicio = null; t.chaveInicio = null;
+    if (t.tipo === "unica") t.concluida = true;
+    salvarTarefa(t);
+    registrar(t, "finalizada" + (dur >= 60000 ? " · "+Math.round(dur/60000)+" min" : ""));
+    // Se tiver outro lembrete esperando na fila, ele aparece na sequência.
+    setTimeout(verificar, 400);
+  }
+
+  // Clicou em "Começar" sem querer: devolve o lembrete para a fila.
+  function cancelarAndamento(idt){
+    var alvo = acharTarefa(idt); if (!alvo || !alvo.inicio) return;
+    var t = Object.assign({}, alvo);
+    t.inicio = null; t.chaveInicio = null;
+    t.ultimoDisparo = null;
+    salvarTarefa(t);
+    registrar(t, "não começou");
+    setTimeout(verificar, 400);
+  }
+  function fmtAdiamento(min){
+    if (min < 60) return min + " min";
+    var h = Math.floor(min/60), m = min%60;
+    return h + " h" + (m ? " " + m + " min" : "");
+  }
+
   function acaoAdiar(min){
     var it = estado.alarmeAtivo; if (!it) return;
     var t = Object.assign({}, it.t);
     t.adiarAte = Date.now() + min*60000;
     t.chaveAdiada = it.oc.chave;
     salvarTarefa(t);
-    registrar(t, min === 10 ? "adiado 10 min" : "adiado 1 hora");
+    registrar(t, "adiado " + fmtAdiamento(min));
     fecharAlarme();
   }
 
   /* ---------------- desenho ---------------- */
   function desenhar(){
+    desenharAndamento();
     desenharProximo();
     desenharListas();
     desenharRegistro();
     document.getElementById("blocoSugestoes").hidden = estado.tarefas.length > 0;
+  }
+
+  function fmtDecorrido(ms){
+    if (ms < 0) ms = 0;
+    var min = Math.floor(ms/60000);
+    if (min < 1) return "começou agora mesmo";
+    if (min < 60) return "já faz "+min+" min";
+    var h = Math.floor(min/60), m = min%60;
+    return "já faz "+h+"h"+(m ? " "+m+" min" : "");
+  }
+
+  function desenharAndamento(){
+    var bloco = document.getElementById("blocoAndamento");
+    var lista = estado.tarefas.filter(function(t){ return !!t.inicio; })
+                             .sort(function(a,b){ return a.inicio - b.inicio; });
+    if (!lista.length){ bloco.hidden = true; bloco.innerHTML = ""; return; }
+    bloco.hidden = false;
+    bloco.innerHTML = lista.map(function(t){
+      return '<div class="rodando">'
+        + '<div class="rodando-corpo">'
+        +   '<span class="rotulo">Fazendo agora</span>'
+        +   '<strong>'+esc(t.titulo)+'</strong>'
+        +   '<span class="quando">Começou às '+fmtHora(new Date(t.inicio))+' — '+esc(fmtDecorrido(Date.now()-t.inicio))+'</span>'
+        +   (t.nota ? '<span class="nota">'+esc(t.nota)+'</span>' : '')
+        + '</div>'
+        + '<div class="rodando-acoes">'
+        +   '<button type="button" class="btn btn-forte" data-fim="'+esc(t.id)+'">Finalizei</button>'
+        +   '<button type="button" class="btn btn-mini" data-cancelar="'+esc(t.id)+'" title="Devolve o lembrete para a fila">Não comecei</button>'
+        + '</div>'
+        + '</div>';
+    }).join("");
   }
 
   function desenharProximo(){
@@ -778,7 +947,8 @@
     var agora = new Date();
     var cls = "item";
     var selo = "";
-    if (!t.ativa){ cls += " pausada"; selo = '<span class="selo cinza">pausada</span>'; }
+    if (t.inicio){ cls += " rodando-item"; selo = '<span class="selo">em andamento</span>'; }
+    else if (!t.ativa){ cls += " pausada"; selo = '<span class="selo cinza">pausada</span>'; }
     else if (t.concluida){ cls += " pausada"; selo = '<span class="selo cinza">concluída</span>'; }
     else if (t.adiarAte && t.adiarAte > Date.now()){
       cls += " adiada";
@@ -820,7 +990,7 @@
   function desenharRegistro(){
     var el = document.getElementById("registro");
     if (!estado.registro.length){
-      el.innerHTML = '<li class="vazio-msg" style="border-style:dashed">Ainda sem registro. Cada “Feito” ou “Adiar” entra aqui.</li>';
+      el.innerHTML = '<li class="vazio-msg" style="border-style:dashed">Ainda sem registro. Cada “Começou”, “Finalizada” ou “Adiar” entra aqui.</li>';
       document.getElementById("btCsv").hidden = true;
       document.getElementById("btLimpar").hidden = true;
       return;
@@ -918,6 +1088,8 @@
       concluida: false,
       adiarAte: null,
       chaveAdiada: null,
+      inicio: antiga && antiga.inicio ? antiga.inicio : null,
+      chaveInicio: antiga && antiga.chaveInicio ? antiga.chaveInicio : null,
       ultimoDisparo: antiga && antiga.ultimoDisparo ? antiga.ultimoDisparo : null,
       criadaEm: antiga ? antiga.criadaEm : Date.now()
     };
@@ -947,7 +1119,8 @@
       salvarTarefa({
         id: novoId(), titulo:s.titulo, nota:s.nota, hora:s.hora, tipo:s.tipo,
         dias:s.dias.slice(), data:"", ativa:true, concluida:false,
-        adiarAte:null, chaveAdiada:null, ultimoDisparo:null, criadaEm:Date.now()
+        adiarAte:null, chaveAdiada:null, inicio:null, chaveInicio:null,
+        ultimoDisparo:null, criadaEm:Date.now()
       });
     });
   }
@@ -995,7 +1168,15 @@
     var t = Object.assign({}, alvo);
     t.ativa = !(t.ativa !== false);
     if (t.ativa){ t.concluida = false; t.adiarAte = null; }
+    else { t.inicio = null; t.chaveInicio = null; }
     salvarTarefa(t);
+  });
+
+  document.getElementById("blocoAndamento").addEventListener("click", function(ev){
+    var f = ev.target.closest("button[data-fim]");
+    if (f){ finalizarTarefa(f.getAttribute("data-fim")); return; }
+    var c = ev.target.closest("button[data-cancelar]");
+    if (c){ cancelarAndamento(c.getAttribute("data-cancelar")); }
   });
 
   document.getElementById("btNotif").addEventListener("click", pedirNotif);
@@ -1013,7 +1194,7 @@
   document.getElementById("btTestar").addEventListener("click", function(){
     garantirAudio();
     dispararAlarme({
-      t: { id:"__teste", titulo:"Teste do alerta", nota:"É assim que o lembrete vai aparecer na sua tela.", hora:fmtHora(new Date()) },
+      t: { id:"__teste", titulo:"Teste do alerta", nota:"É assim que o lembrete vai aparecer na hora de começar a tarefa.", hora:fmtHora(new Date()) },
       oc: { chave:hojeChave(), ts:Date.now(), adiada:false }
     }, 1);
   });
@@ -1028,17 +1209,76 @@
     desenharRegistro();
   });
 
-  document.getElementById("alFeito").addEventListener("click", function(){
+  document.getElementById("alComecar").addEventListener("click", function(){
     if (estado.alarmeAtivo && estado.alarmeAtivo.t.id === "__teste"){ fecharAlarme(); return; }
-    acaoFeito();
+    acaoComecar();
   });
-  document.getElementById("alAdiar10").addEventListener("click", function(){
+  document.getElementById("alPular").addEventListener("click", function(){
     if (estado.alarmeAtivo && estado.alarmeAtivo.t.id === "__teste"){ fecharAlarme(); return; }
-    acaoAdiar(10);
+    acaoPular();
   });
-  document.getElementById("alAdiar60").addEventListener("click", function(){
+  /* ---------------- painel de adiamento ---------------- */
+  var ATALHOS_ADIAR = [3, 5, 10, 15, 30, 60, 120, 240];
+  var unidAdiar = "min";
+
+  function desenharChipsAdiar(){
+    document.getElementById("alAdiarChips").innerHTML = ATALHOS_ADIAR.map(function(m){
+      return '<button type="button" data-adiar="'+m+'">'+esc(fmtAdiamento(m))+'</button>';
+    }).join("");
+  }
+
+  function pintarUnidAdiar(){
+    var bs = document.querySelectorAll("#alAdiarUnid button");
+    for (var i=0;i<bs.length;i++){
+      bs[i].setAttribute("aria-pressed", bs[i].getAttribute("data-unid") === unidAdiar ? "true" : "false");
+    }
+  }
+
+  function abrirPainelAdiar(){
+    var p = document.getElementById("alAdiarPainel");
+    p.hidden = false;
+    document.getElementById("alAdiarErro").textContent = "";
+    // Ela já está atendendo o alerta — o toque repetido só atrapalha a escolha.
+    pararSom();
+    var campo = document.getElementById("alAdiarNum");
+    var ult = Number(estado.config.adiarPadrao);
+    campo.value = isFinite(ult) && ult > 0 ? String(ult) : "";
+    unidAdiar = "min"; pintarUnidAdiar();
+    campo.focus();
+  }
+
+  function fecharPainelAdiar(){
+    document.getElementById("alAdiarPainel").hidden = true;
+    document.getElementById("alAdiarErro").textContent = "";
+  }
+
+  function adiarLivre(){
+    var v = Number(document.getElementById("alAdiarNum").value);
+    var erro = document.getElementById("alAdiarErro");
+    if (!isFinite(v) || v <= 0){ erro.textContent = "Escreva um número maior que zero."; return; }
+    var min = Math.round(unidAdiar === "h" ? v*60 : v);
+    if (min > 1440){ erro.textContent = "O máximo é 24 horas."; return; }
+    estado.config.adiarPadrao = unidAdiar === "h" ? v : min;
+    salvarConfig();
     if (estado.alarmeAtivo && estado.alarmeAtivo.t.id === "__teste"){ fecharAlarme(); return; }
-    acaoAdiar(60);
+    acaoAdiar(min);
+  }
+
+  document.getElementById("alAdiarAbrir").addEventListener("click", abrirPainelAdiar);
+  document.getElementById("alAdiarChips").addEventListener("click", function(ev){
+    var b = ev.target.closest("button[data-adiar]"); if (!b) return;
+    if (estado.alarmeAtivo && estado.alarmeAtivo.t.id === "__teste"){ fecharAlarme(); return; }
+    acaoAdiar(Number(b.getAttribute("data-adiar")));
+  });
+  document.getElementById("alAdiarUnid").addEventListener("click", function(ev){
+    var b = ev.target.closest("button[data-unid]"); if (!b) return;
+    unidAdiar = b.getAttribute("data-unid");
+    pintarUnidAdiar();
+    document.getElementById("alAdiarErro").textContent = "";
+  });
+  document.getElementById("alAdiarOk").addEventListener("click", adiarLivre);
+  document.getElementById("alAdiarNum").addEventListener("keydown", function(ev){
+    if (ev.key === "Enter"){ ev.preventDefault(); adiarLivre(); }
   });
 
   document.getElementById("btTema").addEventListener("click", function(){
@@ -1057,6 +1297,8 @@
   /* ---------------- início ---------------- */
   montarDias();
   desenharChips();
+  desenharChipsAdiar();
+  pintarUnidAdiar();
   lerLocal();
   document.getElementById("tolerancia").value = String(estado.config.tolerancia);
   pintarSom();
@@ -1067,12 +1309,13 @@
 
   setInterval(verificar, 15000);
   setInterval(desenharProximo, 30000);
+  setInterval(desenharAndamento, 30000);
   setTimeout(verificar, 3000);
 
   // Abas em segundo plano têm os temporizadores estrangulados; ao voltar,
   // confere na hora em vez de esperar o próximo ciclo.
   document.addEventListener("visibilitychange", function(){
-    if (!document.hidden){ desenharProximo(); verificar(); }
+    if (!document.hidden){ desenharAndamento(); desenharProximo(); verificar(); }
   });
 
   if (window.claude && typeof window.claude.use === "function"){
