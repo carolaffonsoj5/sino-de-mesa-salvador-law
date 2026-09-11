@@ -276,45 +276,16 @@
   #alarme .botoes .discreto:hover{background:transparent; border-color:#3D5C86; color:#EAF0F7}
   #alarme .rodape{margin-top:26px; font-size:12.5px; color:#93A6C0; max-width:40ch; line-height:1.5}
 
-  /* painel de adiamento */
-  #alAdiarPainel{
-    margin-top:22px; display:flex; flex-direction:column; gap:14px; align-items:center;
-    border:1px solid #3D5C86; border-radius:12px; padding:18px 20px;
-    background:rgba(11,22,38,.55); max-width:520px; width:100%;
+  /* seletor de tempo (reaproveitado: começar, adiar, mais tempo) */
+  .tempo-livre{display:flex; gap:8px; align-items:center}
+  .tempo-livre input{
+    width:90px; font:inherit; font-family:var(--f-num); font-size:15px; text-align:center;
+    border:1px solid var(--line-strong); border-radius:8px; padding:7px 6px;
+    background:var(--surface); color:var(--ink);
   }
-  #alAdiarPainel .pergunta{
-    font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:#A28C63; font-weight:600;
-  }
-  .adiar-chips{display:flex; flex-wrap:wrap; gap:8px; justify-content:center}
-  .adiar-chips button{
-    border:1px solid #3D5C86; background:transparent; color:#EAF0F7;
-    border-radius:999px; padding:8px 16px; font-size:15px; font-weight:500;
-    font-family:var(--f-num); transition:background .15s, border-color .15s;
-  }
-  .adiar-chips button:hover{background:#223A5C; border-color:#5A7CA8}
-  .adiar-livre{display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:center}
-  .adiar-livre input{
-    width:84px; font:inherit; font-family:var(--f-num); font-size:16px; text-align:center;
-    border:1px solid #3D5C86; border-radius:9px; padding:8px 6px;
-    background:#101E33; color:#F3F1EB;
-  }
-  .adiar-unid{display:flex; border:1px solid #3D5C86; border-radius:9px; overflow:hidden}
-  .adiar-unid button{
-    border:0; border-right:1px solid #3D5C86; background:transparent; color:#C7D0DC;
-    padding:9px 14px; font-size:14px; font-weight:500;
-  }
-  .adiar-unid button:last-child{border-right:0}
-  .adiar-unid button[aria-pressed=true]{background:#2B4770; color:#F3F1EB}
-  #alAdiarOk{
-    border:1px solid #B08D4F; background:#B08D4F; color:#10192B;
-    border-radius:9px; padding:9px 20px; font-size:15px; font-weight:600;
-  }
-  #alAdiarOk:hover{background:#C6A263; border-color:#C6A263}
-  #alAdiarErro{font-size:13px; color:#E58A76; min-height:0}
-  @media (max-width:560px){
-    #alAdiarPainel{padding:16px 14px}
-    .adiar-chips button{padding:9px 14px; font-size:14.5px}
-  }
+  .tempo-livre .seg{flex:1}
+  #tempoSub{margin:0; font-size:13.5px; color:var(--ink-2); line-height:1.45}
+  #tempoChips button{font-family:var(--f-num)}
   #alarme .anel{
     position:absolute; width:min(90vmin,900px); aspect-ratio:1; border-radius:50%;
     border:1px solid rgba(201,169,106,.32); pointer-events:none;
@@ -462,29 +433,45 @@
   </form>
 </dialog>
 
+<dialog id="dlgTempo">
+  <div class="dlg-corpo">
+    <h2 id="tempoTitulo">Quanto tempo você precisa?</h2>
+    <p id="tempoSub"></p>
+    <div class="chips" id="tempoChips"></div>
+    <div class="campo">
+      <span class="rotulo">Outro tempo</span>
+      <div class="tempo-livre">
+        <input type="number" id="tempoNum" min="1" max="1440" step="1" inputmode="numeric" aria-label="Quantidade">
+        <div class="seg" id="tempoUnid" role="group" aria-label="Unidade">
+          <button type="button" data-unid="min" aria-pressed="true">minutos</button>
+          <button type="button" data-unid="h" aria-pressed="false">horas</button>
+        </div>
+      </div>
+    </div>
+    <p class="erro" id="tempoErro"></p>
+    <div class="dlg-pe">
+      <button type="button" class="btn btn-mini esq" id="tempoSem" hidden>Sem tempo definido</button>
+      <button type="button" class="btn" id="tempoCancelar">Cancelar</button>
+      <button type="button" class="btn btn-forte" id="tempoOk">Confirmar</button>
+    </div>
+  </div>
+</dialog>
+
 <div id="alarme" hidden role="alertdialog" aria-modal="true" aria-labelledby="alTitulo">
   <div class="anel" aria-hidden="true"></div>
   <span class="fila" id="alFila"></span>
   <span class="rel" id="alRel"></span>
   <div class="titulo" id="alTitulo"></div>
   <div class="nota" id="alNota"></div>
-  <div class="botoes">
+  <div class="botoes" id="botoesInicio">
     <button type="button" class="principal" id="alComecar">Começar agora</button>
     <button type="button" id="alAdiarAbrir">Adiar…</button>
     <button type="button" class="discreto" id="alPular">Pular hoje</button>
   </div>
-  <div id="alAdiarPainel" hidden>
-    <span class="pergunta">Adiar por quanto tempo?</span>
-    <div class="adiar-chips" id="alAdiarChips"></div>
-    <div class="adiar-livre">
-      <input type="number" id="alAdiarNum" min="1" max="1440" step="1" inputmode="numeric" aria-label="Quantidade">
-      <div class="adiar-unid" id="alAdiarUnid" role="group" aria-label="Unidade">
-        <button type="button" data-unid="min" aria-pressed="true">minutos</button>
-        <button type="button" data-unid="h" aria-pressed="false">horas</button>
-      </div>
-      <button type="button" id="alAdiarOk">Adiar</button>
-    </div>
-    <span id="alAdiarErro"></span>
+  <div class="botoes" id="botoesConferir" hidden>
+    <button type="button" class="principal" id="alFinalizei">Finalizei</button>
+    <button type="button" id="alMaisTempo">Preciso de mais tempo</button>
+    <button type="button" class="discreto" id="alParar">Parar sem finalizar</button>
   </div>
   <div class="rodape" id="alRodape"></div>
 </div>
@@ -739,12 +726,14 @@
       if (r && typeof r.then === "function") r.then(function(){ pintarNotif(); }, function(){ pintarNotif(); });
     }catch(e){ pintarNotif(); }
   }
-  function notificar(t){
+  function notificar(t, conferir){
     if (estadoNotif() !== "granted") return;
     try{
       fecharNotif();
-      notifAtual = new Notification(t.titulo, {
-        body: (t.nota ? t.nota + " — " : "") + "Hora de começar (marcado para às " + t.hora + ")",
+      notifAtual = new Notification(conferir ? "Você terminou? — " + t.titulo : t.titulo, {
+        body: conferir
+          ? "Acabou o tempo que você reservou para esta tarefa."
+          : (t.nota ? t.nota + " — " : "") + "Hora de começar (marcado para às " + t.hora + ")",
         tag: "sino-" + t.id,
         requireInteraction: true,
         renotify: true
@@ -761,11 +750,18 @@
   /* ---------------- alarme ---------------- */
   function verificar(){
     if (estado.alarmeAtivo) return;
+    if (dlgTempo && dlgTempo.open) return;
     var agora = new Date();
     var fila = [];
     for (var i=0;i<estado.tarefas.length;i++){
-      var oc = ocorrenciaVencida(estado.tarefas[i], agora);
-      if (oc) fila.push({ t: estado.tarefas[i], oc: oc });
+      var t = estado.tarefas[i];
+      // O tempo reservado acabou: apita para conferir se terminou.
+      if (t.inicio && t.prazo && agora.getTime() >= t.prazo){
+        fila.push({ t:t, oc:{ chave: t.chaveInicio || hojeChave(), ts: t.prazo, adiada:false }, modo:"conferir" });
+        continue;
+      }
+      var oc = ocorrenciaVencida(t, agora);
+      if (oc) fila.push({ t:t, oc:oc, modo:"inicio" });
     }
     if (!fila.length) return;
     fila.sort(function(a,b){ return a.oc.ts - b.oc.ts; });
@@ -774,23 +770,33 @@
 
   function dispararAlarme(item, total){
     estado.alarmeAtivo = item;
+    var conferir = item.modo === "conferir";
     var el = document.getElementById("alarme");
-    document.getElementById("alFila").textContent = total > 1 ? "1 de " + total + " lembretes" : "Lembrete";
-    var atraso = Date.now() - item.oc.ts;
-    var rel = "Hora de começar · marcado para às " + item.t.hora;
-    if (item.oc.adiada) rel = "Adiado — hora de começar";
-    else if (atraso > 90000) rel += " · atrasado " + fmtDuracao(atraso).replace("em ","");
+    document.getElementById("botoesInicio").hidden = conferir;
+    document.getElementById("botoesConferir").hidden = !conferir;
+
+    var rel;
+    if (conferir){
+      document.getElementById("alFila").textContent = "Conferindo";
+      rel = "Acabou o tempo que você reservou · começou às " + fmtHora(new Date(item.t.inicio));
+    } else {
+      document.getElementById("alFila").textContent = total > 1 ? "1 de " + total + " lembretes" : "Lembrete";
+      var atraso = Date.now() - item.oc.ts;
+      rel = "Hora de começar · marcado para às " + item.t.hora;
+      if (item.oc.adiada) rel = "Adiado — hora de começar";
+      else if (atraso > 90000) rel += " · atrasado " + fmtDuracao(atraso).replace("em ","");
+    }
     document.getElementById("alRel").textContent = rel;
-    document.getElementById("alTitulo").textContent = item.t.titulo;
+    document.getElementById("alTitulo").textContent = conferir ? "Você terminou?" : item.t.titulo;
     var n = document.getElementById("alNota");
-    n.textContent = item.t.nota || "";
-    n.hidden = !item.t.nota;
+    var sub = conferir ? item.t.titulo + (item.t.nota ? " — " + item.t.nota : "") : (item.t.nota || "");
+    n.textContent = sub;
+    n.hidden = !sub;
     el.hidden = false;
-    document.getElementById("alAdiarPainel").hidden = true;
     document.body.classList.add("travado");
-    document.getElementById("alComecar").focus();
+    document.getElementById(conferir ? "alFinalizei" : "alComecar").focus();
     iniciarSom();
-    notificar(item.t);
+    notificar(item.t, conferir);
     document.getElementById("alRodape").textContent = somBloqueado()
       ? "O navegador segura o som até alguém clicar na página. Clique em qualquer lugar aqui para liberar."
       : "";
@@ -798,8 +804,6 @@
 
   function fecharAlarme(){
     estado.alarmeAtivo = null;
-    document.getElementById("alAdiarPainel").hidden = true;
-    document.getElementById("alAdiarErro").textContent = "";
     document.getElementById("alarme").hidden = true;
     document.body.classList.remove("travado");
     pararSom();
@@ -814,17 +818,41 @@
   }
 
   // O alarme é a hora de COMEÇAR. A tarefa passa a "em andamento" e só sai de lá
-  // quando ela clicar em "Finalizei".
-  function acaoComecar(){
+  // quando ela clicar em "Finalizei". Se reservou um tempo, apito de novo no fim dele.
+  function acaoComecar(min){
     var it = estado.alarmeAtivo; if (!it) return;
     var t = Object.assign({}, it.t);
     t.ultimoDisparo = it.oc.chave;
     t.adiarAte = null; t.chaveAdiada = null;
     t.inicio = Date.now();
     t.chaveInicio = it.oc.chave;
+    t.prazo = min ? Date.now() + min*60000 : null;
+    t.duracaoMin = min || null;
+    if (min){ estado.config.duracaoPadrao = min; salvarConfig(); }
     salvarTarefa(t);
-    registrar(t, "começou");
+    registrar(t, "começou" + (min ? " · reservou " + fmtDur(min) : ""));
     fecharAlarme();
+  }
+
+  function acaoMaisTempo(min){
+    var it = estado.alarmeAtivo; if (!it) return;
+    var alvo = acharTarefa(it.t.id); if (!alvo) { fecharAlarme(); return; }
+    var t = Object.assign({}, alvo);
+    t.prazo = min ? Date.now() + min*60000 : null;
+    if (min){ estado.config.extraPadrao = min; salvarConfig(); }
+    salvarTarefa(t);
+    registrar(t, min ? "mais " + fmtDur(min) : "seguiu sem prazo");
+    fecharAlarme();
+  }
+
+  // Largou a tarefa no meio: sai do "em andamento" sem contar como concluída.
+  function pararSemFinalizar(idt){
+    var alvo = acharTarefa(idt); if (!alvo || !alvo.inicio) return;
+    var t = Object.assign({}, alvo);
+    t.inicio = null; t.chaveInicio = null; t.prazo = null; t.duracaoMin = null;
+    salvarTarefa(t);
+    registrar(t, "parou sem finalizar");
+    setTimeout(verificar, 400);
   }
 
   function acaoPular(){
@@ -832,7 +860,7 @@
     var t = Object.assign({}, it.t);
     t.ultimoDisparo = it.oc.chave;
     t.adiarAte = null; t.chaveAdiada = null;
-    t.inicio = null; t.chaveInicio = null;
+    t.inicio = null; t.chaveInicio = null; t.prazo = null; t.duracaoMin = null;
     if (t.tipo === "unica") t.concluida = true;
     salvarTarefa(t);
     registrar(t, "pulada");
@@ -843,7 +871,7 @@
     var alvo = acharTarefa(idt); if (!alvo || !alvo.inicio) return;
     var t = Object.assign({}, alvo);
     var dur = Date.now() - t.inicio;
-    t.inicio = null; t.chaveInicio = null;
+    t.inicio = null; t.chaveInicio = null; t.prazo = null; t.duracaoMin = null;
     if (t.tipo === "unica") t.concluida = true;
     salvarTarefa(t);
     registrar(t, "finalizada" + (dur >= 60000 ? " · "+Math.round(dur/60000)+" min" : ""));
@@ -855,25 +883,19 @@
   function cancelarAndamento(idt){
     var alvo = acharTarefa(idt); if (!alvo || !alvo.inicio) return;
     var t = Object.assign({}, alvo);
-    t.inicio = null; t.chaveInicio = null;
+    t.inicio = null; t.chaveInicio = null; t.prazo = null; t.duracaoMin = null;
     t.ultimoDisparo = null;
     salvarTarefa(t);
     registrar(t, "não começou");
     setTimeout(verificar, 400);
   }
-  function fmtAdiamento(min){
-    if (min < 60) return min + " min";
-    var h = Math.floor(min/60), m = min%60;
-    return h + " h" + (m ? " " + m + " min" : "");
-  }
-
   function acaoAdiar(min){
     var it = estado.alarmeAtivo; if (!it) return;
     var t = Object.assign({}, it.t);
     t.adiarAte = Date.now() + min*60000;
     t.chaveAdiada = it.oc.chave;
     salvarTarefa(t);
-    registrar(t, "adiado " + fmtAdiamento(min));
+    registrar(t, "adiado " + fmtDur(min));
     fecharAlarme();
   }
 
@@ -886,13 +908,24 @@
     document.getElementById("blocoSugestoes").hidden = estado.tarefas.length > 0;
   }
 
+  function fmtDur(min){
+    if (min < 60) return min + " min";
+    var h = Math.floor(min/60), m = min%60;
+    return h + " h" + (m ? " " + m + " min" : "");
+  }
+
   function fmtDecorrido(ms){
     if (ms < 0) ms = 0;
     var min = Math.floor(ms/60000);
     if (min < 1) return "começou agora mesmo";
-    if (min < 60) return "já faz "+min+" min";
-    var h = Math.floor(min/60), m = min%60;
-    return "já faz "+h+"h"+(m ? " "+m+" min" : "");
+    return "já faz " + fmtDur(min);
+  }
+
+  function fmtRestante(ms){
+    if (ms > 0) return "faltam " + fmtDur(Math.max(1, Math.ceil(ms/60000)));
+    var atraso = Math.floor(-ms/60000);
+    if (atraso < 1) return "o tempo acabou agora";
+    return "passou " + fmtDur(atraso) + " do previsto";
   }
 
   function desenharAndamento(){
@@ -902,15 +935,22 @@
     if (!lista.length){ bloco.hidden = true; bloco.innerHTML = ""; return; }
     bloco.hidden = false;
     bloco.innerHTML = lista.map(function(t){
+      var quando = "Começou às " + fmtHora(new Date(t.inicio));
+      if (t.prazo){
+        quando += " · até " + fmtHora(new Date(t.prazo)) + " — " + fmtRestante(t.prazo - Date.now());
+      } else {
+        quando += " — " + fmtDecorrido(Date.now() - t.inicio) + " · sem tempo definido";
+      }
       return '<div class="rodando">'
         + '<div class="rodando-corpo">'
         +   '<span class="rotulo">Fazendo agora</span>'
         +   '<strong>'+esc(t.titulo)+'</strong>'
-        +   '<span class="quando">Começou às '+fmtHora(new Date(t.inicio))+' — '+esc(fmtDecorrido(Date.now()-t.inicio))+'</span>'
+        +   '<span class="quando">'+esc(quando)+'</span>'
         +   (t.nota ? '<span class="nota">'+esc(t.nota)+'</span>' : '')
         + '</div>'
         + '<div class="rodando-acoes">'
         +   '<button type="button" class="btn btn-forte" data-fim="'+esc(t.id)+'">Finalizei</button>'
+        +   '<button type="button" class="btn btn-mini" data-tempo-mais="'+esc(t.id)+'">Mudar tempo</button>'
         +   '<button type="button" class="btn btn-mini" data-cancelar="'+esc(t.id)+'" title="Devolve o lembrete para a fila">Não comecei</button>'
         + '</div>'
         + '</div>';
@@ -1090,6 +1130,8 @@
       chaveAdiada: null,
       inicio: antiga && antiga.inicio ? antiga.inicio : null,
       chaveInicio: antiga && antiga.chaveInicio ? antiga.chaveInicio : null,
+      prazo: antiga && antiga.prazo ? antiga.prazo : null,
+      duracaoMin: antiga && antiga.duracaoMin ? antiga.duracaoMin : null,
       ultimoDisparo: antiga && antiga.ultimoDisparo ? antiga.ultimoDisparo : null,
       criadaEm: antiga ? antiga.criadaEm : Date.now()
     };
@@ -1120,7 +1162,7 @@
         id: novoId(), titulo:s.titulo, nota:s.nota, hora:s.hora, tipo:s.tipo,
         dias:s.dias.slice(), data:"", ativa:true, concluida:false,
         adiarAte:null, chaveAdiada:null, inicio:null, chaveInicio:null,
-        ultimoDisparo:null, criadaEm:Date.now()
+        prazo:null, duracaoMin:null, ultimoDisparo:null, criadaEm:Date.now()
       });
     });
   }
@@ -1175,6 +1217,26 @@
   document.getElementById("blocoAndamento").addEventListener("click", function(ev){
     var f = ev.target.closest("button[data-fim]");
     if (f){ finalizarTarefa(f.getAttribute("data-fim")); return; }
+    var m = ev.target.closest("button[data-tempo-mais]");
+    if (m){
+      var idt = m.getAttribute("data-tempo-mais");
+      var alvo = acharTarefa(idt); if (!alvo) return;
+      escolherTempo({
+        titulo: "Mudar o tempo desta tarefa",
+        sub: "Conto a partir de agora. Apito quando acabar.",
+        atalhos: ATALHOS_EXTRA,
+        valor: alvo.duracaoMin || Number(estado.config.duracaoPadrao) || null,
+        semRotulo: "Deixar sem prazo",
+        aoEscolher: function(min){
+          var a = acharTarefa(idt); if (!a || !a.inicio) return;
+          var t = Object.assign({}, a);
+          t.prazo = min ? Date.now() + min*60000 : null;
+          salvarTarefa(t);
+          registrar(t, min ? "novo prazo: " + fmtDur(min) : "seguiu sem prazo");
+        }
+      });
+      return;
+    }
     var c = ev.target.closest("button[data-cancelar]");
     if (c){ cancelarAndamento(c.getAttribute("data-cancelar")); }
   });
@@ -1209,77 +1271,149 @@
     desenharRegistro();
   });
 
-  document.getElementById("alComecar").addEventListener("click", function(){
-    if (estado.alarmeAtivo && estado.alarmeAtivo.t.id === "__teste"){ fecharAlarme(); return; }
-    acaoComecar();
-  });
-  document.getElementById("alPular").addEventListener("click", function(){
-    if (estado.alarmeAtivo && estado.alarmeAtivo.t.id === "__teste"){ fecharAlarme(); return; }
-    acaoPular();
-  });
-  /* ---------------- painel de adiamento ---------------- */
-  var ATALHOS_ADIAR = [3, 5, 10, 15, 30, 60, 120, 240];
-  var unidAdiar = "min";
+  /* ---------------- seletor de tempo ---------------- */
+  var dlgTempo = document.getElementById("dlgTempo");
+  var pedidoTempo = null;   // { aoEscolher, aoCancelar }
+  var unidTempo = "min";
 
-  function desenharChipsAdiar(){
-    document.getElementById("alAdiarChips").innerHTML = ATALHOS_ADIAR.map(function(m){
-      return '<button type="button" data-adiar="'+m+'">'+esc(fmtAdiamento(m))+'</button>';
-    }).join("");
-  }
-
-  function pintarUnidAdiar(){
-    var bs = document.querySelectorAll("#alAdiarUnid button");
+  function pintarUnidTempo(){
+    var bs = document.querySelectorAll("#tempoUnid button");
     for (var i=0;i<bs.length;i++){
-      bs[i].setAttribute("aria-pressed", bs[i].getAttribute("data-unid") === unidAdiar ? "true" : "false");
+      bs[i].setAttribute("aria-pressed", bs[i].getAttribute("data-unid") === unidTempo ? "true" : "false");
     }
   }
 
-  function abrirPainelAdiar(){
-    var p = document.getElementById("alAdiarPainel");
-    p.hidden = false;
-    document.getElementById("alAdiarErro").textContent = "";
-    // Ela já está atendendo o alerta — o toque repetido só atrapalha a escolha.
-    pararSom();
-    var campo = document.getElementById("alAdiarNum");
-    var ult = Number(estado.config.adiarPadrao);
-    campo.value = isFinite(ult) && ult > 0 ? String(ult) : "";
-    unidAdiar = "min"; pintarUnidAdiar();
+  // cfg: { titulo, sub, atalhos:[min], valor, semRotulo, aoEscolher(min|null), aoCancelar }
+  function escolherTempo(cfg){
+    pedidoTempo = cfg;
+    document.getElementById("tempoTitulo").textContent = cfg.titulo || "Quanto tempo?";
+    var sub = document.getElementById("tempoSub");
+    sub.textContent = cfg.sub || "";
+    sub.hidden = !cfg.sub;
+    document.getElementById("tempoChips").innerHTML = (cfg.atalhos || []).map(function(m){
+      return '<button type="button" class="chip" data-tempo="'+m+'">'+esc(fmtDur(m))+'</button>';
+    }).join("");
+    var sem = document.getElementById("tempoSem");
+    sem.hidden = !cfg.semRotulo;
+    if (cfg.semRotulo) sem.textContent = cfg.semRotulo;
+    var campo = document.getElementById("tempoNum");
+    campo.value = cfg.valor > 0 ? String(cfg.valor) : "";
+    unidTempo = "min"; pintarUnidTempo();
+    document.getElementById("tempoErro").textContent = "";
+    dlgTempo.showModal();
     campo.focus();
   }
 
-  function fecharPainelAdiar(){
-    document.getElementById("alAdiarPainel").hidden = true;
-    document.getElementById("alAdiarErro").textContent = "";
+  function responderTempo(min){
+    var cb = pedidoTempo && pedidoTempo.aoEscolher;
+    pedidoTempo = null;
+    dlgTempo.close();
+    if (cb) cb(min);
   }
 
-  function adiarLivre(){
-    var v = Number(document.getElementById("alAdiarNum").value);
-    var erro = document.getElementById("alAdiarErro");
+  function cancelarTempo(){
+    var cb = pedidoTempo && pedidoTempo.aoCancelar;
+    pedidoTempo = null;
+    dlgTempo.close();
+    if (cb) cb();
+  }
+
+  function confirmarTempoLivre(){
+    var v = Number(document.getElementById("tempoNum").value);
+    var erro = document.getElementById("tempoErro");
     if (!isFinite(v) || v <= 0){ erro.textContent = "Escreva um número maior que zero."; return; }
-    var min = Math.round(unidAdiar === "h" ? v*60 : v);
+    var min = Math.round(unidTempo === "h" ? v*60 : v);
     if (min > 1440){ erro.textContent = "O máximo é 24 horas."; return; }
-    estado.config.adiarPadrao = unidAdiar === "h" ? v : min;
-    salvarConfig();
-    if (estado.alarmeAtivo && estado.alarmeAtivo.t.id === "__teste"){ fecharAlarme(); return; }
-    acaoAdiar(min);
+    responderTempo(min);
   }
 
-  document.getElementById("alAdiarAbrir").addEventListener("click", abrirPainelAdiar);
-  document.getElementById("alAdiarChips").addEventListener("click", function(ev){
-    var b = ev.target.closest("button[data-adiar]"); if (!b) return;
-    if (estado.alarmeAtivo && estado.alarmeAtivo.t.id === "__teste"){ fecharAlarme(); return; }
-    acaoAdiar(Number(b.getAttribute("data-adiar")));
+  document.getElementById("tempoChips").addEventListener("click", function(ev){
+    var b = ev.target.closest("button[data-tempo]"); if (!b) return;
+    responderTempo(Number(b.getAttribute("data-tempo")));
   });
-  document.getElementById("alAdiarUnid").addEventListener("click", function(ev){
+  document.getElementById("tempoUnid").addEventListener("click", function(ev){
     var b = ev.target.closest("button[data-unid]"); if (!b) return;
-    unidAdiar = b.getAttribute("data-unid");
-    pintarUnidAdiar();
-    document.getElementById("alAdiarErro").textContent = "";
+    unidTempo = b.getAttribute("data-unid");
+    pintarUnidTempo();
+    document.getElementById("tempoErro").textContent = "";
   });
-  document.getElementById("alAdiarOk").addEventListener("click", adiarLivre);
-  document.getElementById("alAdiarNum").addEventListener("keydown", function(ev){
-    if (ev.key === "Enter"){ ev.preventDefault(); adiarLivre(); }
+  document.getElementById("tempoOk").addEventListener("click", confirmarTempoLivre);
+  document.getElementById("tempoSem").addEventListener("click", function(){ responderTempo(null); });
+  document.getElementById("tempoCancelar").addEventListener("click", cancelarTempo);
+  document.getElementById("tempoNum").addEventListener("keydown", function(ev){
+    if (ev.key === "Enter"){ ev.preventDefault(); confirmarTempoLivre(); }
   });
+  dlgTempo.addEventListener("cancel", function(ev){ ev.preventDefault(); cancelarTempo(); });
+
+  /* ---------------- ações do alarme ---------------- */
+  var ATALHOS_DURACAO = [5, 10, 15, 20, 30, 45, 60, 120];
+  var ATALHOS_ADIAR   = [3, 5, 10, 15, 30, 60, 120, 240];
+  var ATALHOS_EXTRA   = [5, 10, 15, 20, 30, 60];
+
+  document.getElementById("alComecar").addEventListener("click", function(){
+    if (ehTeste()){ fecharAlarme(); return; }
+    var it = estado.alarmeAtivo; if (!it) return;
+    pararSom();
+    escolherTempo({
+      titulo: "Quanto tempo você precisa?",
+      sub: "Vou apitar de novo quando esse tempo acabar, para conferir se você terminou.",
+      atalhos: ATALHOS_DURACAO,
+      valor: Number(estado.config.duracaoPadrao) || null,
+      semRotulo: "Sem tempo definido",
+      aoEscolher: function(min){ acaoComecar(min); }
+    });
+  });
+
+  document.getElementById("alAdiarAbrir").addEventListener("click", function(){
+    if (ehTeste()){ fecharAlarme(); return; }
+    pararSom();
+    escolherTempo({
+      titulo: "Adiar por quanto tempo?",
+      atalhos: ATALHOS_ADIAR,
+      valor: Number(estado.config.adiarPadrao) || null,
+      aoEscolher: function(min){
+        estado.config.adiarPadrao = min; salvarConfig();
+        acaoAdiar(min);
+      }
+    });
+  });
+
+  document.getElementById("alPular").addEventListener("click", function(){
+    if (ehTeste()){ fecharAlarme(); return; }
+    acaoPular();
+  });
+
+  document.getElementById("alFinalizei").addEventListener("click", function(){
+    if (ehTeste()){ fecharAlarme(); return; }
+    var it = estado.alarmeAtivo; if (!it) return;
+    var idt = it.t.id;
+    fecharAlarme();
+    finalizarTarefa(idt);
+  });
+
+  document.getElementById("alMaisTempo").addEventListener("click", function(){
+    if (ehTeste()){ fecharAlarme(); return; }
+    var it = estado.alarmeAtivo; if (!it) return;
+    pararSom();
+    escolherTempo({
+      titulo: "Quanto tempo a mais?",
+      sub: "A tarefa continua em andamento e eu apito de novo no fim desse tempo.",
+      atalhos: ATALHOS_EXTRA,
+      valor: Number(estado.config.extraPadrao) || null,
+      semRotulo: "Deixar sem prazo",
+      aoEscolher: function(min){ acaoMaisTempo(min); }
+    });
+  });
+
+  document.getElementById("alParar").addEventListener("click", function(){
+    if (ehTeste()){ fecharAlarme(); return; }
+    var it = estado.alarmeAtivo; if (!it) return;
+    var idt = it.t.id;
+    fecharAlarme();
+    pararSemFinalizar(idt);
+  });
+
+  function ehTeste(){ return !!(estado.alarmeAtivo && estado.alarmeAtivo.t.id === "__teste"); }
 
   document.getElementById("btTema").addEventListener("click", function(){
     var r = document.documentElement;
@@ -1297,8 +1431,7 @@
   /* ---------------- início ---------------- */
   montarDias();
   desenharChips();
-  desenharChipsAdiar();
-  pintarUnidAdiar();
+  pintarUnidTempo();
   lerLocal();
   document.getElementById("tolerancia").value = String(estado.config.tolerancia);
   pintarSom();
@@ -1309,7 +1442,7 @@
 
   setInterval(verificar, 15000);
   setInterval(desenharProximo, 30000);
-  setInterval(desenharAndamento, 30000);
+  setInterval(desenharAndamento, 15000);
   setTimeout(verificar, 3000);
 
   // Abas em segundo plano têm os temporizadores estrangulados; ao voltar,
